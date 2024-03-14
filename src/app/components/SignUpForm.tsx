@@ -11,10 +11,48 @@ import {
     KeyIcon
 } from "@heroicons/react/20/solid";
 
+
+/* Schemas */
+
+import {z} from 'zod'
+import validator from 'validator'
+
+const FormSchema = z.object({
+    name:z
+    .string()
+    .min(2,"Name must be atleast 2 characters")
+    .max(45,"Name must be less than 45 characters")
+    .regex(new RegExp('^[a-zA-Z ]*$'),"No special character allowed!"),
+    email: z.string().email("Invalid email address, please enter a valid email address"),
+    phone: z
+    .string()
+    .refine(validator.isMobilePhone, "Please enter a valid phone number!"),
+    password: z
+    .string()
+    .min(8, "Password must be atleast 8 characters")
+    .max(30, "Password must be less than 30 characters"),
+    confirmPassword: z
+    .string()
+    .min(8, "Password must be atleast 8 characters")
+    .max(30, "Password must be less than 30 characters"),
+    acceptTerms: z.literal(true,{
+        errorMap:()=>({
+            message:"Please accept the terms and conditions"
+        }),
+    })
+}).refine(data=>data.password===data.confirmPassword,{
+    message:"Passwords do not match",
+    path:["password", "confirmPassword"]
+})
+
 export const SignUpForm = () => {
 
     const [isVisiblePass, setIsVisiblePass] = useState(false);
     const toggleVisblePass = () => setIsVisiblePass((prev) => !prev);
+ 
+
+
+
 
     return (
 

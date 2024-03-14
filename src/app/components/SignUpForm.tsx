@@ -2,9 +2,20 @@
 
 import { Button, Checkbox, Input } from "@nextui-org/react";
 import Link from "next/link";
+import { useState } from "react";
 import 'animate.css';
 
+import {
+    EyeIcon,
+    EyeSlashIcon,
+    KeyIcon
+} from "@heroicons/react/20/solid";
+
 export const SignUpForm = () => {
+
+    const [isVisiblePass, setIsVisiblePass] = useState(false);
+    const toggleVisblePass = () => setIsVisiblePass((prev) => !prev);
+
     return (
 
         <section className="min-h-screen flex items-stretch text-white ">
@@ -54,13 +65,26 @@ export const SignUpForm = () => {
                             <div className="w-full flex flex-col md:flex-row gap-2 justify-center items-center">
                                 <Input
                                     className="col-span-2 max-w-[220px] lg:max-w-[300px]"
-                                    variant="bordered"
                                     label="Password"
+                                    variant="bordered"
+                                    type={isVisiblePass ? "text" : "password"}
+                                    endContent={
+                                        isVisiblePass ?
+                                            <EyeSlashIcon
+                                                className="w-4 cursor-pointer"
+                                                onClick={toggleVisblePass}
+                                            /> :
+                                            <EyeIcon
+                                                className="w-4 cursor-pointer"
+                                                onClick={toggleVisblePass}
+                                            />
+                                    }
                                 />
                                 <Input
                                     className="col-span-2 max-w-[220px] lg:max-w-[300px]"
+                                    label="Password"
                                     variant="bordered"
-                                    label="Confirm Password"
+                                    type={isVisiblePass ? "text" : "password"}                                    
                                 />
                             </div>
                         </div>

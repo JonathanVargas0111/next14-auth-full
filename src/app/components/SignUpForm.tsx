@@ -1,143 +1,140 @@
-"use client";
-
-import { Button, Checkbox, Input } from "@nextui-org/react";
+'use client'
 import Link from "next/link";
 import { useState } from "react";
-import 'animate.css';
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
+import { z } from 'zod';
+import validator from 'validator';
+import { Button, Checkbox, Input } from "@nextui-org/react";
+import { Controller, SubmitHandler } from "react-hook-form";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from "@hookform/resolvers/zod";
 
-import {
-    EyeIcon,
-    EyeSlashIcon,
-    KeyIcon
-} from "@heroicons/react/20/solid";
-
-
-/* Schemas */
-
-import {z} from 'zod'
-import validator from 'validator'
-
+// Definición del esquema de validación
 const FormSchema = z.object({
-    name:z
-    .string()
-    .min(2,"Name must be atleast 2 characters")
-    .max(45,"Name must be less than 45 characters")
-    .regex(new RegExp('^[a-zA-Z ]*$'),"No special character allowed!"),
+    name: z.string()
+        .min(2, "Name must be at least 2 characters")
+        .max(45, "Name must be less than 45 characters")
+        .regex(new RegExp('^[a-zA-Z ]*$'), "No special character allowed!"),
     email: z.string().email("Invalid email address, please enter a valid email address"),
-    phone: z
-    .string()
-    .refine(validator.isMobilePhone, "Please enter a valid phone number!"),
-    password: z
-    .string()
-    .min(8, "Password must be atleast 8 characters")
-    .max(30, "Password must be less than 30 characters"),
-    confirmPassword: z
-    .string()
-    .min(8, "Password must be atleast 8 characters")
-    .max(30, "Password must be less than 30 characters"),
-    acceptTerms: z.literal(true,{
-        errorMap:()=>({
-            message:"Please accept the terms and conditions"
+    phone: z.string().refine(validator.isMobilePhone, "Please enter a valid phone number!"),
+    password: z.string()
+        .min(6, "Password must be at least 6 characters")
+        .max(30, "Password must be less than 30 characters"),
+    confirmPassword: z.string()
+        .min(6, "Password must be at least 6 characters")
+        .max(30, "Password must be less than 30 characters"),
+    acceptTerms: z.literal(true, {
+        errorMap: () => ({
+          message: "Please accept all terms",
         }),
-    })
-}).refine(data=>data.password===data.confirmPassword,{
-    message:"Passwords do not match",
-    path:["password", "confirmPassword"]
-})
+      }),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Password and confirm password doesn't match!",
+    path: ["confirmPassword"],
+});
 
-export const SignUpForm = () => {
+type InputType = z.infer<typeof FormSchema>;
+
+const SignUpForm = () => {
+    const { register, handleSubmit, reset, control, formState: { errors }, } = useForm<InputType>({
+        resolver: zodResolver(FormSchema),
+    })
 
     const [isVisiblePass, setIsVisiblePass] = useState(false);
-    const toggleVisblePass = () => setIsVisiblePass((prev) => !prev);
- 
+    const toggleVisiblePass = () => setIsVisiblePass((prev) => !prev);
 
-
-
+    // Función para guardar el usuario
+    const saveUser: SubmitHandler<InputType> = async (data) => {
+        console.log("User data:", data);
+    }
 
     return (
-
-        <section className="min-h-screen flex items-stretch text-white ">
-            <div className="lg:flex w-1/2 hidden bg-gray-500 relative items-center bg-[url('/img/hero-skate.jpg')]">
-                <div className="absolute bg-black opacity-60 inset-0 z-0"></div>
-                <div className="w-full px-24 z-10">
-                    <h1 className="text-5xl font-bold text-left tracking-wide animate__animated animate__backInLeft">¡Regístrate y comparte tus mejores trucos!</h1>
-                    <p className="text-3xl my-4 animate__animated animate__backInUp"> ¡Es hora de mostrar tu talento en lo que amas!</p>
+        <form
+            onSubmit={handleSubmit(saveUser)}
+            className="sm:w-2/3 w-full mt-5 mx-auto"
+        >
+            <div className="w-full flex flex-row flex-wrap my-5 px-auto gap-4 justify-center">
+                <div className="w-full flex flex-row justify-center">
+                    <Input
+                        errorMessage={errors.name?.message}
+                        isInvalid={!!errors.name}
+                        {...register("name")}
+                        className="col-span-2 max-w-[220px] md:max-w-[440px] lg:max-w-[600px]"
+                        variant="bordered"
+                        label="Name"
+                    />
+                </div>
+                <div className="w-full flex flex-col md:flex-row gap-2 justify-center items-center">
+                    <Input
+                        errorMessage={errors.email?.message}
+                        isInvalid={!!errors.email}
+                        {...register("email")}
+                        className="col-span-2 max-w-[220px] lg:max-w-[300px]"
+                        variant="bordered"
+                        label="Email"
+                    />
+                    <Input
+                        errorMessage={errors.phone?.message}
+                        isInvalid={!!errors.phone}
+                        {...register("phone")}
+                        className="col-span-2 max-w-[220px] lg:max-w-[300px]"
+                        variant="bordered"
+                        label="Phone"
+                    />
+                </div>
+                <div className="w-full flex flex-col md:flex-row gap-2 justify-center items-center">
+                    <Input
+                        errorMessage={errors.password?.message}
+                        isInvalid={!!errors.password}
+                        {...register("password")}
+                        className="col-span-2 max-w-[220px] lg:max-w-[300px]"
+                        label="Password"
+                        variant="bordered"
+                        type={isVisiblePass ? "text" : "password"}
+                        endContent={
+                            isVisiblePass ?
+                                <EyeSlashIcon
+                                    className="w-4 cursor-pointer"
+                                    onClick={toggleVisiblePass}
+                                /> :
+                                <EyeIcon
+                                    className="w-4 cursor-pointer"
+                                    onClick={toggleVisiblePass}
+                                />
+                        }
+                    />
+                    <Input
+                        errorMessage={errors.confirmPassword?.message}
+                        isInvalid={!!errors.confirmPassword}
+                        {...register("confirmPassword")}
+                        className="col-span-2 max-w-[220px] lg:max-w-[300px]"
+                        label="Password"
+                        variant="bordered"
+                        type={isVisiblePass ? "text" : "password"}
+                    />
                 </div>
             </div>
-            <div className="lg:w-1/2 w-full flex items-center justify-center text-center md:px-16 px-0 z-0 " >
-                <div className="absolute lg:hidden z-10 inset-0 bg-gray-500 bg-no-repeat bg-cover items-center bg-[url('/img/hero-skate.jpg')]">
-                    <div className="absolute bg-black opacity-90 inset-0 z-0  bg-gradient-to-r from-slate-900 to-slate-900"></div>
-                </div>
-                <div className="w-full py-6 z-20 flex flex-col justify-items-center animate__animated animate__backInRight">
-                    <div className="w-full px-24 z-10 lg:hidden">
-                        <p className="text-3xl my-4"> ¡Es hora de mostrar tu talento!</p>
-                    </div>
-                    <div className="py-6 space-x-2">
-                        <span className="w-10 h-10  lg:w-14 lg:h-14 items-center justify-center inline-flex rounded-full font-bold text-lg lg:text-2xl border-2 border-red-600">G+ </span>
-                    </div>
-                    <p className="text-gray-100">
-                        or use email your account
-                    </p>
-
-                    <form action="" className="sm:w-2/3 w-full mt-5 mx-auto">
-                        <div className="w-full flex flex-row flex-wrap my-5 px-auto gap-4 justify-center">
-                            <div className="w-full flex flex-row justify-center">
-                                <Input
-                                    className="col-span-2 max-w-[220px] md:max-w-[440px] lg:max-w-[600px]"
-                                    variant="bordered"
-                                    label="Name"
-                                />
-                            </div>
-                            <div className="w-full flex flex-col md:flex-row gap-2 justify-center items-center">
-                                <Input
-                                    className="col-span-2 max-w-[220px] lg:max-w-[300px]"
-                                    variant="bordered"
-                                    label="Email"
-                                />
-                                <Input
-                                    className="col-span-2 max-w-[220px] lg:max-w-[300px]"
-                                    variant="bordered"
-                                    label="Phone"
-                                />
-                            </div>
-                            <div className="w-full flex flex-col md:flex-row gap-2 justify-center items-center">
-                                <Input
-                                    className="col-span-2 max-w-[220px] lg:max-w-[300px]"
-                                    label="Password"
-                                    variant="bordered"
-                                    type={isVisiblePass ? "text" : "password"}
-                                    endContent={
-                                        isVisiblePass ?
-                                            <EyeSlashIcon
-                                                className="w-4 cursor-pointer"
-                                                onClick={toggleVisblePass}
-                                            /> :
-                                            <EyeIcon
-                                                className="w-4 cursor-pointer"
-                                                onClick={toggleVisblePass}
-                                            />
-                                    }
-                                />
-                                <Input
-                                    className="col-span-2 max-w-[220px] lg:max-w-[300px]"
-                                    label="Password"
-                                    variant="bordered"
-                                    type={isVisiblePass ? "text" : "password"}                                    
-                                />
-                            </div>
-                        </div>
-                        <Checkbox>
-                            I Accept the <Link href={"/tems"}>Terms</Link>
-                        </Checkbox>
-                        {/* <div className="text-right text-gray-400 hover:underline hover:text-gray-100">
-                            <a href="#">Forgot your password?</a>
-                        </div> */}
-                        <div className="flex justify-center col-span-2 mt-5">
-                            <Button className="" color="primary" variant="flat" size="lg" >Sign in</Button>
-                        </div>
-                    </form>
-                </div>
+            <Controller
+                control={control}
+                name="acceptTerms"
+                render={({ field }) => (
+                    <Checkbox
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        className="text-sm"
+                    >
+                        I Accept the <Link href={"/tems"}>Terms</Link>
+                    </Checkbox>
+                )}
+            />
+            {!!errors.acceptTerms && (
+                <p className="text-red-500">{errors.acceptTerms.message}</p>
+            )}
+            <div className="flex justify-center col-span-2 mt-5">
+                <Button type="submit" className="" color="primary" variant="flat" size="lg" >Sign in</Button>
             </div>
-        </section>
+        </form>
     )
 }
+
+export default SignUpForm;  

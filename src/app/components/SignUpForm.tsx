@@ -1,6 +1,6 @@
 'use client'
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
 import { z } from 'zod';
 import validator from 'validator';
@@ -8,6 +8,8 @@ import { Button, Checkbox, Input } from "@nextui-org/react";
 import { Controller, SubmitHandler } from "react-hook-form";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod";
+import { passwordStrength } from "check-password-strength";
+import PasswordStrength from "./PasswordStrengthGame";
 
 // Definición del esquema de validación
 const FormSchema = z.object({
@@ -25,9 +27,9 @@ const FormSchema = z.object({
         .max(30, "Password must be less than 30 characters"),
     acceptTerms: z.literal(true, {
         errorMap: () => ({
-          message: "Please accept all terms",
+            message: "Please accept all terms",
         }),
-      }),
+    }),
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Password and confirm password doesn't match!",
     path: ["confirmPassword"],
@@ -36,11 +38,19 @@ const FormSchema = z.object({
 type InputType = z.infer<typeof FormSchema>;
 
 const SignUpForm = () => {
-    const { register, handleSubmit, reset, control, formState: { errors }, } = useForm<InputType>({
+    const { register, handleSubmit, reset, control, watch, formState: { errors }, } = useForm<InputType>({
         resolver: zodResolver(FormSchema),
     })
+    const [passStrength, setPassStrength] = useState(0);
+    const [passConfirmStrength, setPassConfirmStrength] = useState(0);
 
     const [isVisiblePass, setIsVisiblePass] = useState(false);
+
+    useEffect(() => {
+        setPassStrength(passwordStrength(watch().password).id);
+        setPassConfirmStrength(passwordStrength(watch().confirmPassword).id);
+    }, [watch().password, watch().confirmPassword])
+
     const toggleVisiblePass = () => setIsVisiblePass((prev) => !prev);
 
     // Función para guardar el usuario
@@ -56,6 +66,7 @@ const SignUpForm = () => {
             <div className="w-full flex flex-row flex-wrap my-5 px-auto gap-4 justify-center">
                 <div className="w-full flex flex-row justify-center">
                     <Input
+                        isRequired
                         errorMessage={errors.name?.message}
                         isInvalid={!!errors.name}
                         {...register("name")}
@@ -66,6 +77,7 @@ const SignUpForm = () => {
                 </div>
                 <div className="w-full flex flex-col md:flex-row gap-2 justify-center items-center">
                     <Input
+                        isRequired
                         errorMessage={errors.email?.message}
                         isInvalid={!!errors.email}
                         {...register("email")}
@@ -74,6 +86,7 @@ const SignUpForm = () => {
                         label="Email"
                     />
                     <Input
+                        isRequired
                         errorMessage={errors.phone?.message}
                         isInvalid={!!errors.phone}
                         {...register("phone")}
@@ -84,6 +97,7 @@ const SignUpForm = () => {
                 </div>
                 <div className="w-full flex flex-col md:flex-row gap-2 justify-center items-center">
                     <Input
+                        isRequired
                         errorMessage={errors.password?.message}
                         isInvalid={!!errors.password}
                         {...register("password")}
@@ -102,15 +116,23 @@ const SignUpForm = () => {
                                     onClick={toggleVisiblePass}
                                 />
                         }
+                        description={
+                            <PasswordStrength passStrength={passStrength} />
+                        }
                     />
+
                     <Input
+                        isRequired
                         errorMessage={errors.confirmPassword?.message}
                         isInvalid={!!errors.confirmPassword}
                         {...register("confirmPassword")}
                         className="col-span-2 max-w-[220px] lg:max-w-[300px]"
-                        label="Password"
+                        label="Confirm Pass"
                         variant="bordered"
                         type={isVisiblePass ? "text" : "password"}
+                        description={
+                            <PasswordStrength passStrength={passConfirmStrength} />
+                        }
                     />
                 </div>
             </div>

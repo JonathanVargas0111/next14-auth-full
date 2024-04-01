@@ -10,6 +10,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { passwordStrength } from "check-password-strength";
 import PasswordStrength from "./PasswordStrengthGame";
+import { registerUser } from "@/lib/actions/authActions";
+import { toast } from "react-toastify";
 
 // Definición del esquema de validación
 const FormSchema = z.object({
@@ -54,8 +56,16 @@ const SignUpForm = () => {
     const toggleVisiblePass = () => setIsVisiblePass((prev) => !prev);
 
     // Función para guardar el usuario
-    const saveUser: SubmitHandler<InputType> = async (data) => {
-        console.log("User data:", data);
+    const saveUser: SubmitHandler<InputType> = async (data) => {        
+        const {acceptTerms, confirmPassword,...user} = data
+        try {
+            const result = await registerUser(user);
+            toast.success("The user registered successfully!");
+        } catch (error) {
+            toast.error("An error occurred while registering the user!");
+            console.error("Error:", error);
+        }
+
     }
 
     return (

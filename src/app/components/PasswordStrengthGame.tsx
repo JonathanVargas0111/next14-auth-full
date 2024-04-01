@@ -5,11 +5,9 @@ interface Props {
     style?: string,
 }
 
-const PasswordStrength = ({ passStrength, style }: Props) => {
-    console.log(passStrength);
-    
+const PasswordStrength = ({ passStrength, style }: Props) => {    
     return (
-        <div className={`flex mt-1 ml-2 border border-slate-600 rounded-lg max-w-48 gap-[1px]`}>           
+        <div className={`flex mt-1 ml-2 border border-slate-600 rounded-lg max-w-48 gap-[1px] ${style}`}>           
             {
                 Array.from({
                     length: passStrength + 1

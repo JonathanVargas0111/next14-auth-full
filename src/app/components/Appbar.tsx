@@ -1,5 +1,6 @@
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem, NavbarMenuToggle, NavbarMenu, NavbarMenuItem, Button } from "@nextui-org/react";
 import Link from "next/link";
+import SigninButton from "./SigninButton";
 
 const Appbar = () => {
     return (
@@ -26,9 +27,7 @@ const Appbar = () => {
             </NavbarContent>
             <NavbarContent justify="end">
                 <NavbarItem>
-                    <Button as={Link} color="primary" href="/auth/signup" variant="flat">
-                        Sign Up
-                    </Button>
+                   <SigninButton></SigninButton>
                 </NavbarItem>
             </NavbarContent>
         </Navbar>

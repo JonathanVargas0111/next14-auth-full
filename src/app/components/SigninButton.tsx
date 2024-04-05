@@ -12,6 +12,7 @@ const SigninButton = () => {
             {
                 session && session.user ? (
                     <>
+                        <p>{session.user.name}</p>
                         <p>{session.user.email}</p>
                         {/* <Link
                             className='text-sky-500 hover:text-sky-600 transition-colors'

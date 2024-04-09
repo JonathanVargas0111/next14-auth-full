@@ -7,6 +7,8 @@ import { Button } from '@nextui-org/react'
 
 const SigninButton = () => {
     const { data: session } = useSession()
+
+    console.log({session});
     return (
         <div className='flex items-center gap-2'>
             {
@@ -18,12 +20,12 @@ const SigninButton = () => {
                             className='text-sky-500 hover:text-sky-600 transition-colors'
                             href={"/api/auth/signout"}
                         >Sign Out</Link> */}
-                        <Button as={Link} color="secondary"  variant="flat" href={"/api/auth/signout"}>Sign Out</Button>                        
+                        <Button as={Link} color="secondary" variant="flat" href={"/api/auth/signout"}>Sign Out</Button>
                     </>
                 ) : (
                     <>
-                        <Button as={Link} color="primary"  variant="flat" href={"/api/auth/signin"}>Sign In</Button>
-                        <Button as={Link} color="primary"  variant="flat" href={"/auth/signup"}>Sign Up</Button>
+                        <Button as={Link} color="primary" variant="flat" href={"/api/auth/signin"}>Sign In</Button>
+                        <Button as={Link} color="primary" variant="flat" href={"/auth/signup"}>Sign Up</Button>
                     </>
                 )
             }

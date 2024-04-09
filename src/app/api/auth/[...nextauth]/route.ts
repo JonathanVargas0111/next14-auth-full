@@ -10,6 +10,7 @@ import * as bcrypt from "bcrypt";
 
 // Importa NextAuth para inicializar la autenticación
 import NextAuth from 'next-auth/next';
+import { User } from '@prisma/client';
 
 // Configuración de opciones de autenticación
     export const authOptions: AuthOptions = {
@@ -55,7 +56,18 @@ import NextAuth from 'next-auth/next';
                 return userWithoutPass;
             },
         })
-    ]
+    ],
+    callbacks: {
+        async jwt({ token, user }) {
+          if (user) token.user = user as User;
+          return token;
+        },
+    
+        async session({ token, session }) {
+          session.user = token.user;
+          return session;
+        },
+      },
 }
 
 // Inicializa NextAuth con las opciones de autenticación

@@ -13,9 +13,13 @@ import NextAuth from 'next-auth/next';
 import { User } from '@prisma/client';
 
 // Configuración de opciones de autenticación
-    export const authOptions: AuthOptions = {
-    providers: [
+export const authOptions: AuthOptions = {
 
+    pages: {
+        signIn: "/auth/signin",
+    },
+    
+    providers: [
         // Proveedor de credenciales para autenticación personalizada
         CredentialsProvider({
             name: "Credentials",
@@ -59,15 +63,15 @@ import { User } from '@prisma/client';
     ],
     callbacks: {
         async jwt({ token, user }) {
-          if (user) token.user = user as User;
-          return token;
+            if (user) token.user = user as User;
+            return token;
         },
-    
+
         async session({ token, session }) {
-          session.user = token.user;
-          return session;
+            session.user = token.user;
+            return session;
         },
-      },
+    },
 }
 
 // Inicializa NextAuth con las opciones de autenticación
